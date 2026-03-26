@@ -41,7 +41,7 @@ Example:
 import random
 
 def purchase_item(itemPrice: int, startingMoney: int, quantityToPurchase: int = 1):
-  """
+    """
     Determine how many items a player can purchase.
 
     Calculates the maximum number of items a player can afford
@@ -63,11 +63,12 @@ def purchase_item(itemPrice: int, startingMoney: int, quantityToPurchase: int = 
         >>> purchase_item(10, 50, 3)
         (3, 20)
     """
-  
-  max_affordable = startingMoney // itemPrice
-  quantity_purchased = min(quantityToPurchase, max_affordable)
-  remaining_money = startingMoney - (quantity_purchased * itemPrice)
-  return quantity_purchased, remaining_money
+    
+    max_affordable = startingMoney // itemPrice
+    quantity_purchased = min(quantityToPurchase, max_affordable)
+    remaining_money = startingMoney - (quantity_purchased * itemPrice)
+
+    return quantity_purchased, remaining_money
 
 
 def new_random_monster():
@@ -127,7 +128,7 @@ def new_random_monster():
     return monster
 
 def print_welcome(player_name):
-"""
+    """
     Display a welcome message to the player.
 
     Prints a formatted greeting introducing the player to the

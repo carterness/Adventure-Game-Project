@@ -40,9 +40,8 @@ Example:
 
 import random
 
-
 def purchase_item(itemPrice: int, startingMoney: int, quantityToPurchase: int = 1):
-"""
+  """
     Determine how many items a player can purchase.
 
     Calculates the maximum number of items a player can afford

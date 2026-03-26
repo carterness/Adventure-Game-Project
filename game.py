@@ -2,7 +2,6 @@ import gamefunctions as gf
 
 
 def main():
-
     # Get player name
     player_name = input("Enter your name: ")
 

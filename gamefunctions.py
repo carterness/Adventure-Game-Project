@@ -63,12 +63,11 @@ def purchase_item(itemPrice: int, startingMoney: int, quantityToPurchase: int = 
         >>> purchase_item(10, 50, 3)
         (3, 20)
     """
-    
-    max_affordable = startingMoney // itemPrice
-    quantity_purchased = min(quantityToPurchase, max_affordable)
-    remaining_money = startingMoney - (quantity_purchased * itemPrice)
-
-    return quantity_purchased, remaining_money
+  
+  max_affordable = startingMoney // itemPrice
+  quantity_purchased = min(quantityToPurchase, max_affordable)
+  remaining_money = startingMoney - (quantity_purchased * itemPrice)
+  return quantity_purchased, remaining_money
 
 
 def new_random_monster():

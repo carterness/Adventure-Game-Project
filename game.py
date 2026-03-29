@@ -8,28 +8,77 @@ def main():
     # Welcome message
     gf.print_welcome(player_name)
 
-    # Show shop
-    print("\nWelcome to the shop!")
-    gf.print_shop_menu()
+    hp = 30
+    gold = 10
 
-    # Simulate purchase
-    print("\nLet's buy some potions!")
-    money = 50
-    quantity, remaining = gf.purchase_item(10, money, 3)
+    while True:
+        print("\nYou are in town.")
+        print(f"Current HP: {hp}, Current Gold: {gold}")
+        print("What would you like to do?")
+        print("1) Leave town (Fight Monster)")
+        print("2) Sleep (Restore HP for 5 Gold)")
+        print("3) Quit")
 
-    print(f"You bought {quantity} potion(s).")
-    print(f"You have ${remaining} left.")
+        while True:
+            choice = input("Enter choice: ")
+            if choice in ["1", "2", "3"]:
+                break
+            print("Invalid choice. Please enter 1, 2, or 3.")
 
-    # Generate a monster
+        if choice == "1":
+            hp, gold = gf.fight_monster(hp, gold)
+
+        elif choice == "2":
+            hp, gold = gf.sleep_inn(hp, gold)
+
+        elif choice == "3":
+            print("Thanks for playing!")
+            break
+
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
+def fight_monster(player_hp, player_gold):
+    monster = new_random_monster()
+
     print("\nA wild monster appears!")
-    monster = gf.new_random_monster()
+    print(f"{monster['name']}: {monster['description']}")
 
-    print(f"Name: {monster['name']}")
-    print(f"Description: {monster['description']}")
-    print(f"Health: {monster['health']}")
-    print(f"Power: {monster['power']}")
-    print(f"Money dropped: {monster['money']}")
+    monster_hp = monster["health"]
 
+    while player_hp > 0 and monster_hp > 0:
+        display_fight_stats(player_hp, monster)
+
+        action = get_user_fight_action()
+
+        if action == "1":
+            # Player attacks
+            player_damage = random.randint(8, 15)
+            monster_damage = monster["power"]
+
+            monster_hp -= player_damage
+            player_hp -= monster_damage
+
+            print(f"You deal {player_damage} damage!")
+            print(f"The {monster['name']} deals {monster_damage} damage!")
+
+        elif action == "2":
+            print("You ran away!")
+            break
+
+        else:
+            print("Invalid choice! Please enter 1 or 2")
+
+    if player_hp <= 0:
+        print("You were defeated...")
+        player_hp = 0
+
+    elif monster_hp <= 0:
+        print(f"You defeated the {monster['name']}!")
+        print(f"You earned {monster['money']} gold!")
+        player_gold += monster["money"]
+
+    return player_hp, player_gold
 
 if __name__ == "__main__":
     main()

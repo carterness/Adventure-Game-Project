@@ -1,29 +1,32 @@
 import gamefunctions as gf
 
 
-def main():
-    # Get player name
-    player_name = input("Enter your name: ")
+def get_main_menu_choice():
+    while True:
+        print("\nYou are in town.")
+        print("1) Leave town (Fight Monster)")
+        print("2) Sleep (Restore HP for 5 Gold)")
+        print("3) Quit")
 
-    # Welcome message
+        choice = input("Enter choice: ")
+
+        if choice in ["1", "2", "3"]:
+            return choice
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
+
+def main():
+    player_name = input("Enter your name: ")
     gf.print_welcome(player_name)
 
     hp = 30
     gold = 10
 
     while True:
-        print("\nYou are in town.")
-        print(f"Current HP: {hp}, Current Gold: {gold}")
-        print("What would you like to do?")
-        print("1) Leave town (Fight Monster)")
-        print("2) Sleep (Restore HP for 5 Gold)")
-        print("3) Quit")
+        print(f"\nCurrent HP: {hp}, Current Gold: {gold}")
 
-        while True:
-            choice = input("Enter choice: ")
-            if choice in ["1", "2", "3"]:
-                break
-            print("Invalid choice. Please enter 1, 2, or 3.")
+        choice = get_main_menu_choice()
 
         if choice == "1":
             hp, gold = gf.fight_monster(hp, gold)
@@ -35,8 +38,10 @@ def main():
             print("Thanks for playing!")
             break
 
-        else:
-            print("Invalid choice. Please enter 1, 2, or 3.")
+        if hp <= 0:
+            print("Game Over!")
+            break
+
 
 if __name__ == "__main__":
     main()

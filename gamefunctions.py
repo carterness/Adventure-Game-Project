@@ -180,6 +180,64 @@ def print_shop_menu():
         print(f"| {item_name:<12}{price:>8.2f} |".replace(f"{price:>8.2f}", f"${price:>7.2f}"))
     
     print(border)
+def display_fight_stats(player_hp, monster_name, monster_hp):
+    print("\n--- Fight Status ---")
+    print(f"Your HP: {player_hp}")
+    print(f"{monster_name} HP: {monster_hp}")
+
+def get_user_fight_action():
+    while True:
+        print("\nChoose an action:")
+        print("1) Attack")
+        print("2) Run Away")
+
+        choice = input("Enter choice: ")
+
+        if choice in ["1", "2"]:
+            return choice
+        else:
+            print("Invalid choice. Please enter 1 or 2.")
+
+def fight_monster(player_hp, player_gold):
+    monster = new_random_monster()
+
+    print("\nA wild monster appears!")
+    print(f"{monster['name']}: {monster['description']}")
+
+    monster_hp = monster["health"]
+
+    while player_hp > 0 and monster_hp > 0:
+        display_fight_stats(player_hp, monster)
+
+        action = get_user_fight_action()
+
+        if action == "1":
+            player_damage = random.randint(8, 15)
+            monster_damage = monster["power"]
+
+            monster_hp -= player_damage
+            player_hp -= monster_damage
+
+            print(f"You deal {player_damage} damage!")
+            print(f"The {monster['name']} deals {monster_damage} damage!")
+
+        elif action == "2":
+            print("You ran away!")
+            break
+
+        else:
+            print("Invalid choice! Please enter 1 or 2")
+
+    if player_hp <= 0:
+        print("You were defeated...")
+        player_hp = 0
+
+    elif monster_hp <= 0:
+        print(f"You defeated the {monster['name']}!")
+        print(f"You earned {monster['money']} gold!")
+        player_gold += monster["money"]
+
+    return player_hp, player_gold
 
 # Demonstration Section
 

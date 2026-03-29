@@ -180,6 +180,17 @@ def print_shop_menu():
         print(f"| {item_name:<12}{price:>8.2f} |".replace(f"{price:>8.2f}", f"${price:>7.2f}"))
     
     print(border)
+
+def sleep_inn(player_hp, player_gold):
+    if player_gold >= 5:
+        player_gold -= 5
+        player_hp = 30
+        print("You feel rested! HP restored to 30.")
+    else:
+        print("Not enough gold to sleep!")
+
+    return player_hp, player_gold
+
 def display_fight_stats(player_hp, monster_name, monster_hp):
     print("\n--- Fight Status ---")
     print(f"Your HP: {player_hp}")

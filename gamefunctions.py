@@ -218,7 +218,7 @@ def fight_monster(player_hp, player_gold):
     monster_hp = monster["health"]
 
     while player_hp > 0 and monster_hp > 0:
-        display_fight_stats(player_hp, monster)
+        display_fight_stats(player_hp, monster["name"], monster_hp)
 
         action = get_user_fight_action()
 

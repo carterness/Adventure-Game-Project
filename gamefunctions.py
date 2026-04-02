@@ -249,7 +249,14 @@ def fight_monster(player_hp, player_gold):
         player_gold += monster["money"]
 
     return player_hp, player_gold
-
+  """
+  Creates a wild monster in front of the player.
+  Shows power and choice to fight or run away.
+  
+  Parameters: 2
+  
+  Returns: You defeated the ___ or You were defeated...
+  """
 # Demonstration Section
 
 def test_functions():

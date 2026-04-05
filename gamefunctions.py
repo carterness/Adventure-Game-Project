@@ -224,7 +224,6 @@ def fight_monster(state):
 
     monster_hp = monster["health"]
 
-    # 💣 Check bomb FIRST
     if use_bomb(state):
         player["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
@@ -238,7 +237,6 @@ def fight_monster(state):
         if action == "1":
             base_damage = random.randint(8, 15)
 
-            # 🗡 Add weapon bonus if equipped
             weapon = player["equipped_weapon"]
             if weapon:
                 base_damage += weapon["damage"]
@@ -246,7 +244,6 @@ def fight_monster(state):
 
                 print(f"Your {weapon['name']} adds {weapon['damage']} damage!")
 
-                # Break weapon
                 if weapon["currentDurability"] <= 0:
                     print(f"Your {weapon['name']} broke!")
                     player["inventory"].remove(weapon)
@@ -282,16 +279,10 @@ def fight_monster(state):
 
 def initialize_game_state(player_name):
     return {
-        "player": {
-            "name": player_name,
-            "hp": 30,
-            "gold": 20,
-            "inventory": [],
-            "equipped_weapon": None
-        },
-        "game": {
-            "monsters_defeated": 0
-        }
+        "player_name": player_name,
+        "player_gold": 1000,  # plenty for testing
+        "player_hp": 30,
+        "player_inventory": []
     }
 
 def create_sword():
@@ -314,13 +305,64 @@ def add_to_inventory(state, item):
     state["player"]["inventory"].append(item)
     print(f"{item['name']} added to inventory!")
 
-def equip_weapon(state, weapon_name):
-    for item in state["player"]["inventory"]:
-        if item["name"].lower() == weapon_name.lower() and item["type"] == "weapon":
-            state["player"]["equipped_weapon"] = item
-            print(f"{weapon_name} equipped!")
-            return
-    print("Weapon not found in inventory.")
+def get_items_by_type(state, item_type):
+    return [item for item in state["player_inventory"] if item["type"] == item_type]
+
+def equip_item(state, item_type):
+    valid_items = get_items_by_type(state, item_type)
+
+    if not valid_items:
+        print(f"No {item_type}s available to equip.")
+        return
+
+    print(f"\nChoose a {item_type} to equip:")
+
+    for i, item in enumerate(valid_items, start=1):
+        print(f"{i}) {item['name']} (Durability: {item.get('currentDurability', 'N/A')})")
+
+    print("0) None")
+
+    choice = input("Enter choice: ")
+
+    if choice == "0":
+        print("Nothing equipped.")
+        return
+
+    if not choice.isdigit() or int(choice) < 1 or int(choice) > len(valid_items):
+        print("Invalid choice.")
+        return
+
+    selected_item = valid_items[int(choice) - 1]
+
+    # Unequip all other items of this type
+    for item in state["player_inventory"]:
+        if item.get("type") == item_type and "equipped" in item:
+            item["equipped"] = False
+
+    # Equip selected item
+    selected_item["equipped"] = True
+
+    print(f"{selected_item['name']} equipped!")
+
+def get_equipped_weapon(state):
+    for item in state["player_inventory"]:
+        if item.get("type") == "weapon" and item.get("equipped"):
+            return item
+    return None
+
+weapon = get_equipped_weapon(state)
+
+damage = random.randint(8, 15)
+
+if weapon:
+    damage += weapon["damage"]
+    weapon["currentDurability"] -= 1
+
+    print(f"Using {weapon['name']}! +{weapon['damage']} damage")
+
+    if weapon["currentDurability"] <= 0:
+        print(f"Your {weapon['name']} broke!")
+        state["player_inventory"].remove(weapon)
 
 def use_bomb(state):
     inventory = state["player"]["inventory"]
@@ -377,5 +419,18 @@ def test_inventory_system():
     equip_weapon(state, "Sword")
 
     print(state)
+def test_equipping():
+    state = initialize_game_state("Jeff")
+
+    add_to_inventory(state, create_sword())
+    add_to_inventory(state, create_sword())  # multiple swords
+    add_to_inventory(state, create_bomb())
+
+    equip_item(state, "weapon")
+
+    print("\nFinal Inventory:")
+    for item in state["player_inventory"]:
+        print(item)
+
 if __name__ == "__main__":
     test_functions()

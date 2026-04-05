@@ -187,15 +187,13 @@ def buy_sword(state):
     else:
         print("Not enough gold!")
 
-def sleep_inn(player_hp, player_gold):
-    if player_gold >= 5:
-        player_gold -= 5
-        player_hp = 30
+def sleep_inn(state):
+    if state["player_gold"] >= 5:
+        state["player_gold"] -= 5
+        state["player_hp"] = 30
         print("You feel rested! HP restored to 30.")
     else:
-        print("Not enough gold to sleep!")
-
-    return player_hp, player_gold
+        print("Not enough gold!")
 
 def display_fight_stats(player_hp, monster_name, monster_hp):
     print("\n--- Fight Status ---")
@@ -216,7 +214,6 @@ def get_user_fight_action():
             print("Invalid choice. Please enter 1 or 2.")
 
 def fight_monster(state):
-    player = state["player"]
     monster = new_random_monster()
 
     print("\nA wild monster appears!")
@@ -225,49 +222,47 @@ def fight_monster(state):
     monster_hp = monster["health"]
 
     if use_bomb(state):
-        player["gold"] += monster["money"]
-        state["game"]["monsters_defeated"] += 1
+        state["player_gold"] += monster["money"]
+        print(f"You earned {monster['money']} gold!")
         return
 
-    while player["hp"] > 0 and monster_hp > 0:
-        display_fight_stats(player["hp"], monster["name"], monster_hp)
+    while state["player_hp"] > 0 and monster_hp > 0:
+        display_fight_stats(state["player_hp"], monster["name"], monster_hp)
 
         action = get_user_fight_action()
 
         if action == "1":
-            base_damage = random.randint(8, 15)
+            damage = random.randint(8, 15)
 
-            weapon = player["equipped_weapon"]
+            weapon = get_equipped_weapon(state)
             if weapon:
-                base_damage += weapon["damage"]
+                damage += weapon["damage"]
                 weapon["currentDurability"] -= 1
 
-                print(f"Your {weapon['name']} adds {weapon['damage']} damage!")
+                print(f"Using {weapon['name']}! +{weapon['damage']} damage")
 
                 if weapon["currentDurability"] <= 0:
                     print(f"Your {weapon['name']} broke!")
-                    player["inventory"].remove(weapon)
-                    player["equipped_weapon"] = None
+                    state["player_inventory"].remove(weapon)
 
-            monster_hp -= base_damage
-            player["hp"] -= monster["power"]
+            monster_hp -= damage
+            state["player_hp"] -= monster["power"]
 
-            print(f"You deal {base_damage} damage!")
+            print(f"You deal {damage} damage!")
             print(f"The {monster['name']} deals {monster['power']} damage!")
 
         elif action == "2":
             print("You ran away!")
             return
 
-    if player["hp"] <= 0:
+    if state["player_hp"] <= 0:
         print("You were defeated...")
-        player["hp"] = 0
+        state["player_hp"] = 0
 
     elif monster_hp <= 0:
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
-        player["gold"] += monster["money"]
-        state["game"]["monsters_defeated"] += 1
+        state["player_gold"] += monster["money"]
   """
   Creates a wild monster in front of the player.
   Shows power and choice to fight or run away.

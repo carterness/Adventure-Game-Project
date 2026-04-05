@@ -214,6 +214,10 @@ def get_user_fight_action():
             print("Invalid choice. Please enter 1 or 2.")
 
 def fight_monster(state):
+    """
+    Creates a wild monster encounter.
+    Player can fight or run away.
+    """
     monster = new_random_monster()
 
     print("\nA wild monster appears!")
@@ -263,12 +267,6 @@ def fight_monster(state):
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
         state["player_gold"] += monster["money"]
-   """
-   Creates a wild monster in front of the player.
-   Shows power and choice to fight or run away.
-  
-   Returns: You defeated the ___ or You were defeated...
-   """
 
 def initialize_game_state(player_name):
     return {

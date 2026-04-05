@@ -263,14 +263,12 @@ def fight_monster(state):
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
         state["player_gold"] += monster["money"]
-  """
-  Creates a wild monster in front of the player.
-  Shows power and choice to fight or run away.
+   """
+   Creates a wild monster in front of the player.
+   Shows power and choice to fight or run away.
   
-  Parameters: 2
-  
-  Returns: You defeated the ___ or You were defeated...
-  """
+   Returns: You defeated the ___ or You were defeated...
+   """
 
 def initialize_game_state(player_name):
     return {

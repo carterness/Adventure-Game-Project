@@ -180,6 +180,12 @@ def print_shop_menu():
         print(f"| {item_name:<12}{price:>8.2f} |".replace(f"{price:>8.2f}", f"${price:>7.2f}"))
     
     print(border)
+def buy_sword(state):
+    if state["player"]["gold"] >= 50:
+        state["player"]["gold"] -= 50
+        add_to_inventory(state, create_sword())
+    else:
+        print("Not enough gold!")
 
 def sleep_inn(player_hp, player_gold):
     if player_gold >= 5:
@@ -209,7 +215,8 @@ def get_user_fight_action():
         else:
             print("Invalid choice. Please enter 1 or 2.")
 
-def fight_monster(player_hp, player_gold):
+def fight_monster(state):
+    player = state["player"]
     monster = new_random_monster()
 
     print("\nA wild monster appears!")
@@ -217,38 +224,53 @@ def fight_monster(player_hp, player_gold):
 
     monster_hp = monster["health"]
 
-    while player_hp > 0 and monster_hp > 0:
-        display_fight_stats(player_hp, monster["name"], monster_hp)
+    # 💣 Check bomb FIRST
+    if use_bomb(state):
+        player["gold"] += monster["money"]
+        state["game"]["monsters_defeated"] += 1
+        return
+
+    while player["hp"] > 0 and monster_hp > 0:
+        display_fight_stats(player["hp"], monster["name"], monster_hp)
 
         action = get_user_fight_action()
 
         if action == "1":
-            player_damage = random.randint(8, 15)
-            monster_damage = monster["power"]
+            base_damage = random.randint(8, 15)
 
-            monster_hp -= player_damage
-            player_hp -= monster_damage
+            # 🗡 Add weapon bonus if equipped
+            weapon = player["equipped_weapon"]
+            if weapon:
+                base_damage += weapon["damage"]
+                weapon["currentDurability"] -= 1
 
-            print(f"You deal {player_damage} damage!")
-            print(f"The {monster['name']} deals {monster_damage} damage!")
+                print(f"Your {weapon['name']} adds {weapon['damage']} damage!")
+
+                # Break weapon
+                if weapon["currentDurability"] <= 0:
+                    print(f"Your {weapon['name']} broke!")
+                    player["inventory"].remove(weapon)
+                    player["equipped_weapon"] = None
+
+            monster_hp -= base_damage
+            player["hp"] -= monster["power"]
+
+            print(f"You deal {base_damage} damage!")
+            print(f"The {monster['name']} deals {monster['power']} damage!")
 
         elif action == "2":
             print("You ran away!")
-            break
+            return
 
-        else:
-            print("Invalid choice! Please enter 1 or 2")
-
-    if player_hp <= 0:
+    if player["hp"] <= 0:
         print("You were defeated...")
-        player_hp = 0
+        player["hp"] = 0
 
     elif monster_hp <= 0:
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
-        player_gold += monster["money"]
-
-    return player_hp, player_gold
+        player["gold"] += monster["money"]
+        state["game"]["monsters_defeated"] += 1
   """
   Creates a wild monster in front of the player.
   Shows power and choice to fight or run away.
@@ -257,6 +279,59 @@ def fight_monster(player_hp, player_gold):
   
   Returns: You defeated the ___ or You were defeated...
   """
+
+def initialize_game_state(player_name):
+    return {
+        "player": {
+            "name": player_name,
+            "hp": 30,
+            "gold": 20,
+            "inventory": [],
+            "equipped_weapon": None
+        },
+        "game": {
+            "monsters_defeated": 0
+        }
+    }
+
+def create_sword():
+    return {
+        "name": "Sword",
+        "type": "weapon",
+        "damage": 5,
+        "maxDurability": 10,
+        "currentDurability": 10
+    }
+
+def create_bomb():
+    return {
+        "name": "Bomb",
+        "type": "consumable",
+        "effect": "instant_kill"
+    }
+
+def add_to_inventory(state, item):
+    state["player"]["inventory"].append(item)
+    print(f"{item['name']} added to inventory!")
+
+def equip_weapon(state, weapon_name):
+    for item in state["player"]["inventory"]:
+        if item["name"].lower() == weapon_name.lower() and item["type"] == "weapon":
+            state["player"]["equipped_weapon"] = item
+            print(f"{weapon_name} equipped!")
+            return
+    print("Weapon not found in inventory.")
+
+def use_bomb(state):
+    inventory = state["player"]["inventory"]
+
+    for item in inventory:
+        if item["name"] == "Bomb":
+            inventory.remove(item)
+            print("You used a Bomb! Monster defeated instantly!")
+            return True
+
+    return False
 # Demonstration Section
 
 def test_functions():
@@ -293,6 +368,14 @@ def test_functions():
     # ---- print_shop_menu tests ----
     print()
     print_shop_menu()
+def test_inventory_system():
+    state = initialize_game_state("Carter")
 
+    add_to_inventory(state, create_sword())
+    add_to_inventory(state, create_bomb())
+
+    equip_weapon(state, "Sword")
+
+    print(state)
 if __name__ == "__main__":
     test_functions()

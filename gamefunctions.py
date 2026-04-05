@@ -345,8 +345,6 @@ def get_equipped_weapon(state):
             return item
     return None
 
-weapon = get_equipped_weapon(state)
-
 damage = random.randint(8, 15)
 
 if weapon:

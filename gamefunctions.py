@@ -341,18 +341,6 @@ def get_equipped_weapon(state):
             return item
     return None
 
-damage = random.randint(8, 15)
-
-if weapon:
-    damage += weapon["damage"]
-    weapon["currentDurability"] -= 1
-
-    print(f"Using {weapon['name']}! +{weapon['damage']} damage")
-
-    if weapon["currentDurability"] <= 0:
-        print(f"Your {weapon['name']} broke!")
-        state["player_inventory"].remove(weapon)
-
 def use_bomb(state):
     inventory = state["player"]["inventory"]
 

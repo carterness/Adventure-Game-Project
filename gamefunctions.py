@@ -269,11 +269,21 @@ def fight_monster(state):
         state["player_gold"] += monster["money"]
 
 def initialize_game_state(player_name):
+    """
+    Initialize the game state dictionary for a new player.
+
+    Returns a dictionary containing player info and game stats.
+    """
     return {
-        "player_name": player_name,
-        "player_gold": 1000,  # plenty for testing
-        "player_hp": 30,
-        "player_inventory": []
+        "player": {
+            "name": player_name,
+            "gold": 1000,       # starting gold
+            "hp": 30,           # starting HP
+            "inventory": []     # empty inventory
+        },
+        "game": {
+            "monsters_defeated": 0
+        }
     }
 
 def create_sword():

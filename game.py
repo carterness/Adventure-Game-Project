@@ -46,7 +46,7 @@ def main():
             print("Thanks for playing!")
             break
 
-        if state["player_hp"] <= 0:
+        if state["player"]["hp"] <= 0:
             print("Game Over!")
             break
 

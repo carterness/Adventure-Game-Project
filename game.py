@@ -28,6 +28,7 @@ def main():
     gf.add_to_inventory(state, gf.create_bomb())
 
     while True:
+        player = state["player']
         print(f"\nHP: {state['player_hp']} | Gold: {state['player_gold']}")
 
         choice = get_main_menu_choice()

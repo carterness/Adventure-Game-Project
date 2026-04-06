@@ -226,7 +226,7 @@ def fight_monster(state):
     monster_hp = monster["health"]
 
     if use_bomb(state):
-        state["player_gold"] += monster["money"]
+        state["player"]["gold"] += monster["money"]
         print(f"You earned {monster['money']} gold!")
         return
 
@@ -250,7 +250,7 @@ def fight_monster(state):
                     state["player_inventory"].remove(weapon)
 
             monster_hp -= damage
-            state["player_hp"] -= monster["power"]
+            state["player"]["gold"] += monster["money"]
 
             print(f"You deal {damage} damage!")
             print(f"The {monster['name']} deals {monster['power']} damage!")

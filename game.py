@@ -29,7 +29,7 @@ def main():
 
     while True:
         player = state["player"]
-        print(f"\nHP: {state['player_hp']} | Gold: {state['player_gold']}")
+        print(f"\nHP: {player['hp']} | Gold: {player['gold']}")
 
         choice = get_main_menu_choice()
 

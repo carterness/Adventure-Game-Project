@@ -188,9 +188,9 @@ def buy_sword(state):
         print("Not enough gold!")
 
 def sleep_inn(state):
-    if state["player_gold"] >= 5:
-        state["player_gold"] -= 5
-        state["player_hp"] = 30
+    if state["player"]["gold"] >= 5:
+        state["player"]["gold"] -= 5
+        state["player"]["hp"] = 30
         print("You feel rested! HP restored to 30.")
     else:
         print("Not enough gold!")
@@ -259,14 +259,14 @@ def fight_monster(state):
             print("You ran away!")
             return
 
-    if state["player_hp"] <= 0:
+    if state["player"]["hp"] <= 0:
         print("You were defeated...")
-        state["player_hp"] = 0
+        state["player"]["hp"] = 0
 
     elif monster_hp <= 0:
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
-        state["player_gold"] += monster["money"]
+        state["player"]["gold"] += monster["money"]
 
 def initialize_game_state(player_name):
     """
@@ -307,7 +307,7 @@ def add_to_inventory(state, item):
     print(f"{item['name']} added to inventory!")
 
 def get_items_by_type(state, item_type):
-    return [item for item in state["player_inventory"] if item["type"] == item_type]
+    return [item for item in state["player"]["inventory"] if item["type"] == item_type]
 
 def equip_item(state, item_type):
     valid_items = get_items_by_type(state, item_type)
@@ -336,7 +336,7 @@ def equip_item(state, item_type):
     selected_item = valid_items[int(choice) - 1]
 
     # Unequip all other items of this type
-    for item in state["player_inventory"]:
+    for item in state["player"]["inventory"]:
         if item.get("type") == item_type and "equipped" in item:
             item["equipped"] = False
 
@@ -346,7 +346,7 @@ def equip_item(state, item_type):
     print(f"{selected_item['name']} equipped!")
 
 def get_equipped_weapon(state):
-    for item in state["player_inventory"]:
+    for item in state["player"]["inventory"]:
         if item.get("type") == "weapon" and item.get("equipped"):
             return item
     return None

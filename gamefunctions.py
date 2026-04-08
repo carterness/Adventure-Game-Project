@@ -231,7 +231,7 @@ def fight_monster(state):
         return
 
     while state["player_hp"] > 0 and monster_hp > 0:
-        display_fight_stats(state["player_hp"], monster["name"], monster_hp)
+        display_fight_stats(state["player"]["hp"], monster["name"], monster_hp)
 
         action = get_user_fight_action()
 
@@ -247,7 +247,7 @@ def fight_monster(state):
 
                 if weapon["currentDurability"] <= 0:
                     print(f"Your {weapon['name']} broke!")
-                    state["player_inventory"].remove(weapon)
+                    state["player"]["inventory"].remove(weapon)
 
             monster_hp -= damage
             state["player"]["gold"] += monster["money"]

@@ -214,10 +214,8 @@ def get_user_fight_action():
             print("Invalid choice. Please enter 1 or 2.")
 
 def fight_monster(state):
-    """
-    Creates a wild monster encounter.
-    Player can fight or run away.
-    """
+    import random
+
     monster = new_random_monster()
 
     print("\nA wild monster appears!")
@@ -225,22 +223,30 @@ def fight_monster(state):
 
     monster_hp = monster["health"]
 
+    # Bomb check (instant win)
     if use_bomb(state):
-        state["player"]["gold"] += monster["money"]
+        print(f"You defeated the {monster['name']} instantly!")
         print(f"You earned {monster['money']} gold!")
+        state["player"]["gold"] += monster["money"]
+        state["game"]["monsters_defeated"] += 1
         return
 
     while state["player"]["hp"] > 0 and monster_hp > 0:
         display_fight_stats(state["player"]["hp"], monster["name"], monster_hp)
 
-        action = get_user_fight_action()
+        print("\nChoose an action:")
+        print("1) Attack")
+        print("2) Use Potion")
+        print("3) Run Away")
 
-        if action == "1":
-            damage = random.randint(8, 15)
+        choice = input("Enter choice: ")
+
+        if choice == "1":
+            base_damage = random.randint(5, 12)
 
             weapon = get_equipped_weapon(state)
             if weapon:
-                damage += weapon["damage"]
+                base_damage += weapon["damage"]
                 weapon["currentDurability"] -= 1
 
                 print(f"Using {weapon['name']}! +{weapon['damage']} damage")
@@ -249,15 +255,56 @@ def fight_monster(state):
                     print(f"Your {weapon['name']} broke!")
                     state["player"]["inventory"].remove(weapon)
 
-            monster_hp -= damage
-            state["player"]["gold"] += monster["money"]
+            # Critical hit (20% chance)
+            if random.random() < 0.2:
+                base_damage *= 2
+                print("CRITICAL HIT!")
 
-            print(f"You deal {damage} damage!")
-            print(f"The {monster['name']} deals {monster['power']} damage!")
+            monster_hp -= base_damage
+            print(f"You deal {base_damage} damage!")
 
-        elif action == "2":
-            print("You ran away!")
-            return
+        elif choice == "2":
+            inventory = state["player"]["inventory"]
+            for item in inventory:
+                if item["name"] == "Potion":
+                    state["player"]["hp"] += 15
+                    state["player"]["hp"] = min(state["player"]["hp"], 30)
+                    inventory.remove(item)
+                    print("You used a Potion! (+15 HP)")
+                    break
+            else:
+                print("No potions available!")
+                continue
+
+        elif choice == "3":
+            if random.random() < 0.5:
+                print("You successfully ran away!")
+                return
+            else:
+                print("You failed to escape!")
+
+        else:
+            print("Invalid choice.")
+            continue
+
+        if monster_hp > 0:
+            damage = random.randint(monster["power"] - 3, monster["power"] + 3)
+
+            # Shield reduction
+            shield = None
+            for item in state["player"]["inventory"]:
+                if item.get("type") == "armor":
+                    shield = item
+                    break
+
+            if shield:
+                damage = max(0, damage - 3)
+                print("Your shield reduces damage!")
+
+            state["player"]["hp"] -= damage
+            state["player"]["hp"] = max(0, state["player"]["hp"])
+
+            print(f"The {monster['name']} deals {damage} damage!")
 
     if state["player"]["hp"] <= 0:
         print("You were defeated...")
@@ -267,6 +314,7 @@ def fight_monster(state):
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
         state["player"]["gold"] += monster["money"]
+        state["game"]["monsters_defeated"] += 1
 
 def initialize_game_state(player_name):
     """

@@ -230,7 +230,7 @@ def fight_monster(state):
         print(f"You earned {monster['money']} gold!")
         return
 
-    while state["player_hp"] > 0 and monster_hp > 0:
+    while state["player"]["hp"] > 0 and monster_hp > 0:
         display_fight_stats(state["player"]["hp"], monster["name"], monster_hp)
 
         action = get_user_fight_action()

@@ -187,6 +187,28 @@ def buy_sword(state):
     else:
         print("Not enough gold!")
 
+def view_inventory(state):
+    inventory = state["player"]["inventory"]
+
+    if not inventory:
+        print("Your inventory is empty.")
+        return
+
+    print("\n--- Inventory ---")
+
+    for i, item in enumerate(inventory, start=1):
+        line = f"{i}) {item['name']}"
+
+        # Show durability if it exists
+        if "currentDurability" in item:
+            line += f" ({item['currentDurability']}/{item['maxDurability']})"
+
+        # Show if equipped
+        if item.get("equipped"):
+            line += " [EQUIPPED]"
+
+        print(line)
+
 def sleep_inn(state):
     if state["player"]["gold"] >= 5:
         state["player"]["gold"] -= 5

@@ -249,9 +249,10 @@ def fight_monster(state):
                 base_damage += weapon["damage"]
                 weapon["currentDurability"] -= 1
 
-                print(f"Using {weapon['name']}! +{weapon['damage']} damage")
+                print(f"Using {weapon['name']}! +{weapon['damage']} damage "
+                    f"(Durability: {weapon['currentDurability']}/{weapon['maxDurability']})")
 
-                if weapon["currentDurability"] <= 0:
+                if weapon["currentDurability"] == 0:
                     print(f"Your {weapon['name']} broke!")
                     state["player"]["inventory"].remove(weapon)
 
@@ -367,7 +368,12 @@ def equip_item(state, item_type):
     print(f"\nChoose a {item_type} to equip:")
 
     for i, item in enumerate(valid_items, start=1):
-        print(f"{i}) {item['name']} (Durability: {item.get('currentDurability', 'N/A')})")
+        dur = item.get("currentDurability", "N/A")
+        max_dur = item.get("maxDurability", "")
+        if max_dur != "":
+            dur = f"{dur}/{max_dur}"
+
+    print(f"{i}) {item['name']} (Durability: {dur})")
 
     print("0) None")
 

@@ -26,12 +26,13 @@ def get_main_menu_choice():
         print("2) Sleep (Restore HP for 5 Gold)")
         print("3) Equip Weapon")
         print("4) Visit Shop")
-        print("5) Save and Quit")
-        print("6) Quit WITHOUT Saving")
+        print("5) View Inventory")
+        print("6) Save and Quit")
+        print("7) Quit WITHOUT Saving")
 
         choice = input("Enter choice: ")
 
-        if choice in ["1", "2", "3", "4", "5", "6"]:
+        if choice in ["1", "2", "3", "4", "5", "6", "7"]:
             return choice
         else:
             print("Invalid choice.")
@@ -94,7 +95,7 @@ def shop_menu(state):
                     gf.add_to_inventory(state, {"name": "Food", "type": "consumable"})
             else:
                 print("Not enough gold!")
-
+        
         elif choice == "5":
             print("Leaving shop...")
             break
@@ -124,6 +125,9 @@ def game_loop(state):
             shop_menu(state)
 
         elif choice == "5":
+            gf.view_inventory(state)
+
+        elif choice == "6":
             filename = input("Enter save filename (or press Enter for default): ")
             if filename == "":
                 filename = "savegame.json"
@@ -132,7 +136,7 @@ def game_loop(state):
             print("Game saved. Goodbye!")
             break
 
-        elif choice == "6":
+        elif choice == "7":
             print("Goodbye!")
             break
 

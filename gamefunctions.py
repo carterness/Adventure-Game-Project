@@ -403,7 +403,7 @@ def test_inventory_system():
     add_to_inventory(state, create_sword())
     add_to_inventory(state, create_bomb())
 
-    equip_weapon(state, "Sword")
+    equip_item(state, "weapon")
 
     print(state)
 def test_equipping():

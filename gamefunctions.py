@@ -238,6 +238,19 @@ def get_user_fight_action():
 def fight_monster(state):
     import random
 
+    current_pos = state["map"]["player_pos"]
+    state["map"]["monster_positions"].remove(current_pos)
+
+    # Spawn a new monster somewhere else
+    size = state["map"]["size"]
+    town = state["map"]["town_pos"]
+
+    while True:
+      new_pos = [random.randint(0, size - 1), random.randint(0, size - 1)]
+      if new_pos != town and new_pos not in state["map"]["monster_positions"]:
+        state["map"]["monster_positions"].append(new_pos)
+        break
+    
     monster = new_random_monster()
 
     print("\nA wild monster appears!")
@@ -345,6 +358,18 @@ def initialize_game_state(player_name):
 
     Returns a dictionary containing player info and game stats.
     """
+    size = 10
+    town_pos = [0, 0]
+
+    monster_positions = []
+
+    # Generate 2 unique monster positions
+    while len(monster_positions) < 2:
+        pos = [random.randint(0, size - 1), random.randint(0, size - 1)]
+
+        if pos != town_pos and pos not in monster_positions:
+            monster_positions.append(pos)
+
     return {
         "player": {
             "name": player_name,
@@ -356,10 +381,10 @@ def initialize_game_state(player_name):
             "monsters_defeated": 0
         },
         "map": {
-            "player_pos": [0, 0],     # starting at town
-            "town_pos": [0, 0],
-            "monster_pos": [5, 5],    # you can change this
-            "size": 10
+            "player_pos": town_pos.copy(),     # starting at town
+            "town_pos": town_pos,
+            "monster_pos": monster_positions,
+            "size": size
         }
     }
 
@@ -466,7 +491,7 @@ def move_player(state, direction):
     if [x, y] == state["map"]["town_pos"]:
         return "returned_to_town"
 
-    elif [x, y] == state["map"]["monster_pos"]:
+    elif [x, y] in state["map"]["monster_positions"]:
         return "monster_encounter"
 
     else:
@@ -476,7 +501,7 @@ def display_map(state):
     size = state["map"]["size"]
     player = state["map"]["player_pos"]
     town = state["map"]["town_pos"]
-    monster = state["map"]["monster_pos"]
+    monster = state["map"]["monster_positions"]
 
     print("\n--- Map ---")
 
@@ -487,7 +512,7 @@ def display_map(state):
                 row += " P "
             elif [x, y] == town:
                 row += " T "
-            elif [x, y] == monster:
+            elif [x, y] in monster:
                 row += " M "
             else:
                 row += " . "

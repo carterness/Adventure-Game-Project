@@ -355,6 +355,12 @@ def initialize_game_state(player_name):
         "game": {
             "monsters_defeated": 0
         }
+        "map": {
+            "player_pos": [0, 0],     # starting at town
+            "town_pos": [0, 0],
+            "monster_pos": [5, 5],    # you can change this
+            "size": 10
+        }
     }
 
 def create_sword():
@@ -437,6 +443,88 @@ def use_bomb(state):
             return True
 
     return False
+
+def move_player(state, direction):
+    x, y = state["map"]["player_pos"]
+    size = state["map"]["size"]
+
+    if direction == "up":
+        y -= 1
+    elif direction == "down":
+        y += 1
+    elif direction == "left":
+        x -= 1
+    elif direction == "right":
+        x += 1
+
+    # Boundary check
+    if x < 0 or x >= size or y < 0 or y >= size:
+        return "invalid"
+
+    state["map"]["player_pos"] = [x, y]
+
+    if [x, y] == state["map"]["town_pos"]:
+        return "returned_to_town"
+
+    elif [x, y] == state["map"]["monster_pos"]:
+        return "monster_encounter"
+
+    else:
+        return "moved"
+
+def display_map(state):
+    size = state["map"]["size"]
+    player = state["map"]["player_pos"]
+    town = state["map"]["town_pos"]
+    monster = state["map"]["monster_pos"]
+
+    print("\n--- Map ---")
+
+    for y in range(size):
+        row = ""
+        for x in range(size):
+            if [x, y] == player:
+                row += " P "
+            elif [x, y] == town:
+                row += " T "
+            elif [x, y] == monster:
+                row += " M "
+            else:
+                row += " . "
+        print(row)
+
+def run_map_interface(state):
+    print("\nEntering the world map...")
+
+    while True:
+        display_map(state)
+
+        print("\nMove: w=up, s=down, a=left, d=right")
+        choice = input("Enter move: ").lower()
+
+        if choice == "w":
+            result = move_player(state, "up")
+        elif choice == "s":
+            result = move_player(state, "down")
+        elif choice == "a":
+            result = move_player(state, "left")
+        elif choice == "d":
+            result = move_player(state, "right")
+        else:
+            print("Invalid input.")
+            continue
+
+        if result == "invalid":
+            print("You can't move there!")
+        elif result == "moved":
+            pass
+        elif result == "returned_to_town":
+            print("You returned to town.")
+            return "town"
+        elif result == "monster_encounter":
+            print("A monster blocks your path!")
+            return "monster"
+
 # Demonstration Section
 
 def test_functions():

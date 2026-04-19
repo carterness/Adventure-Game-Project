@@ -510,11 +510,8 @@ def display_map(state):
     monster = state["map"]["monster_positions"]
     
     if monsters is None:
-      # fallback for old saves
       single = state["map"].get("monster_pos")
-      if monsters is None:
-        single = state["map"].get("monster_pos")
-        monsters = [single] if single else []
+      monsters = [single] if single else []
 
     print("\n--- Map ---")
 

@@ -354,7 +354,7 @@ def initialize_game_state(player_name):
         },
         "game": {
             "monsters_defeated": 0
-        }
+        },
         "map": {
             "player_pos": [0, 0],     # starting at town
             "town_pos": [0, 0],

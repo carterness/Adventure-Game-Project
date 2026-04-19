@@ -147,7 +147,13 @@ def game_loop(state):
             print("Game Over!")
             break
 
-
+def normalize_map_state(state):
+    if "monster_positions" not in state["map"]:
+        single = state["map"].get("monster_pos")
+        if single:
+            state["map"]["monster_positions"] = [single]
+        else:
+            state["map"]["monster_positions"] = []
 
 def main():
     print("1) New Game")
@@ -174,14 +180,17 @@ def main():
 
         gf.print_welcome(state["player"]["name"])
         print(f"Welcome back, {state['player']['name']}!")
+        
+        normalize_map_state(state)
 
+        gf.print_welcome(state["player"]["name"])
+        print(f"Welcome back, {state['player']['name']}!")
+        
     else:
         print("Invalid choice.")
         return
 
     game_loop(state)
-
-
 
 if __name__ == "__main__":
     main()

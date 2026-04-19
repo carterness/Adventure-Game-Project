@@ -22,7 +22,7 @@ def load_game(filename="savegame.json"):
 def get_main_menu_choice():
     while True:
         print("\nYou are in town.")
-        print("1) Leave town (Fight Monster)")
+        print("1) Open Map")
         print("2) Sleep (Restore HP for 5 Gold)")
         print("3) Equip Weapon")
         print("4) Visit Shop")
@@ -113,6 +113,9 @@ def game_loop(state):
         choice = get_main_menu_choice()
 
         if choice == "1":
+            result = gf.run_map_interface(state)
+
+        if result == "monster":
             gf.fight_monster(state)
 
         elif choice == "2":

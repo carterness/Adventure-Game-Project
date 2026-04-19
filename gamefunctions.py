@@ -491,8 +491,14 @@ def move_player(state, direction):
     if [x, y] == state["map"]["town_pos"]:
         return "returned_to_town"
 
-    elif [x, y] in state["map"]["monster_positions"]:
-        return "monster_encounter"
+    monsters = state["map"].get("monster_positions")
+
+    if monsters is None:
+      single = state["map"].get("monster_pos")
+      monsters = [single] if single else []
+
+    elif [x, y] in monsters:
+      return "monster_encounter"
 
     else:
         return "moved"
@@ -502,6 +508,11 @@ def display_map(state):
     player = state["map"]["player_pos"]
     town = state["map"]["town_pos"]
     monster = state["map"]["monster_positions"]
+    
+    if monsters is None:
+      # fallback for old saves
+      single = state["map"].get("monster_pos")
+      monsters = [single] if single else []
 
     print("\n--- Map ---")
 

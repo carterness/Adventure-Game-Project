@@ -512,7 +512,9 @@ def display_map(state):
     if monsters is None:
       # fallback for old saves
       single = state["map"].get("monster_pos")
-      monsters = [single] if single else []
+      if monsters is None:
+        single = state["map"].get("monster_pos")
+        monsters = [single] if single else []
 
     print("\n--- Map ---")
 
@@ -523,7 +525,7 @@ def display_map(state):
                 row += " P "
             elif [x, y] == town:
                 row += " T "
-            elif [x, y] in monster:
+            elif [x, y] in monsters:
                 row += " M "
             else:
                 row += " . "

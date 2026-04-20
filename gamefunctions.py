@@ -238,8 +238,8 @@ def get_user_fight_action():
 def fight_monster(state):
     import random
 
-    current_pos = state["map"]["player_pos"]
-    state["map"]["monster_positions"].remove(current_pos)
+    if current_pos in state["map"]["player_pos"]:
+      state["map"]["monster_positions"].remove(current_pos)
 
     # Spawn a new monster somewhere else
     size = state["map"]["size"]
@@ -383,7 +383,7 @@ def initialize_game_state(player_name):
         "map": {
             "player_pos": town_pos.copy(),     # starting at town
             "town_pos": town_pos,
-            "monster_pos": monster_positions,
+            "monster_positions": monster_positions,
             "size": size
         }
     }
@@ -426,7 +426,7 @@ def equip_item(state, item_type):
         if max_dur != "":
             dur = f"{dur}/{max_dur}"
 
-    print(f"{i}) {item['name']} (Durability: {dur})")
+        print(f"{i}) {item['name']} (Durability: {dur})")
 
     print("0) None")
 
@@ -491,27 +491,19 @@ def move_player(state, direction):
     if [x, y] == state["map"]["town_pos"]:
         return "returned_to_town"
 
-    monsters = state["map"].get("monster_positions")
+    monsters = state["map"].get("monster_positions", [])
 
-    if monsters is None:
-      single = state["map"].get("monster_pos")
-      monsters = [single] if single else []
+    if [x, y] in monsters:
+        return "monster_encounter"
 
-    elif [x, y] in monsters:
-      return "monster_encounter"
-
-    else:
-        return "moved"
+    return "moved"
 
 def display_map(state):
     size = state["map"]["size"]
     player = state["map"]["player_pos"]
     town = state["map"]["town_pos"]
-    monster = state["map"]["monster_positions"]
-    
-    if monsters is None:
-      single = state["map"].get("monster_pos")
-      monsters = [single] if single else []
+
+    monsters = state["map"].get("monster_positions", [])
 
     print("\n--- Map ---")
 

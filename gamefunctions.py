@@ -238,10 +238,11 @@ def get_user_fight_action():
 def fight_monster(state):
     import random
 
-    if current_pos in state["map"]["player_pos"]:
-      state["map"]["monster_positions"].remove(current_pos)
+    current_pos = state["map"]["player_pos"]
 
-    # Spawn a new monster somewhere else
+    if current_pos in state["map"]["monster_positions"]:
+        state["map"]["monster_positions"].remove(current_pos)
+
     size = state["map"]["size"]
     town = state["map"]["town_pos"]
 

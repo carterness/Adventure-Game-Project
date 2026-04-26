@@ -10,9 +10,10 @@ def save_game(state, filename="savegame.json"):
 
 
 def save_game(state, filename):
-    state_copy = state.copy()
+    import copy
 
-    # Convert monsters to JSON-safe format
+    state_copy = copy.deepcopy(state)
+
     state_copy["monsters"] = [m.to_dict() for m in state["monsters"]]
 
     with open(filename, "w") as f:
@@ -119,6 +120,30 @@ def game_loop(state):
 
         if result == "monster":
             gf.fight_monster(state)
+
+            player_pos = tuple(state["map"]["player_pos"])
+
+            state["monsters"] = [
+                m for m in state["monsters"]
+                if (m.x, m.y) != player_pos
+            ]
+
+        if len(state["monsters"]) == 0:
+            size = state["map"]["size"]
+            town = tuple(state["map"]["town_pos"])
+
+            state["monsters"].append(
+            WanderingMonster.random_spawn([], [town], size, size)
+            )
+
+            state["monsters"].append(
+                WanderingMonster.random_spawn(
+                    [(m.x, m.y) for m in state["monsters"]],
+                    [town],
+                    size,
+                    size
+                )
+            )
 
         elif choice == "2":
             gf.sleep_inn(state)

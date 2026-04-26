@@ -352,7 +352,8 @@ def fight_monster(state):
         print(f"You earned {monster['money']} gold!")
         state["player"]["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
-      player_pos = tuple(state["map"]["player_pos"])
+    
+    player_pos = tuple(state["map"]["player_pos"])
 
     state["monsters"] = [
         m for m in state["monsters"]

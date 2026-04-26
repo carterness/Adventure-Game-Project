@@ -538,7 +538,6 @@ def display_map(state):
                 row += " T "
 
             else:
-                # Check monsters INSIDE the loop
                 monster_here = False
                 for monster in state["monsters"]:
                     if [x, y] == [monster.x, monster.y]:

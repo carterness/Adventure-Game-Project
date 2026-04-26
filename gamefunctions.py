@@ -352,6 +352,25 @@ def fight_monster(state):
         print(f"You earned {monster['money']} gold!")
         state["player"]["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
+      player_pos = tuple(state["map"]["player_pos"])
+
+    state["monsters"] = [
+        m for m in state["monsters"]
+        if (m.x, m.y) != player_pos
+    ]
+    if len(state["monsters"]) == 0:
+        state["monsters"].append(
+            WanderingMonster.random_spawn([], [(0, 0)], 10, 10)
+        )
+        state["monsters"].append(
+            WanderingMonster.random_spawn(
+                [(m.x, m.y) for m in state["monsters"]],
+                [(0, 0)],
+                10, 10
+            )
+        )
+
+from WanderingMonster import WanderingMonster
 
 def initialize_game_state(player_name):
     """
@@ -360,33 +379,34 @@ def initialize_game_state(player_name):
     Returns a dictionary containing player info and game stats.
     """
     size = 10
-    town_pos = [0, 0]
+    town_pos = (0, 0)
 
-    monster_positions = []
-
-    # Generate 2 unique monster positions
-    while len(monster_positions) < 2:
-        pos = [random.randint(0, size - 1), random.randint(0, size - 1)]
-
-        if pos != town_pos and pos not in monster_positions:
-            monster_positions.append(pos)
+    # Spawn ONE monster at start
+    monsters = [
+        WanderingMonster.random_spawn(
+            occupied=[],
+            forbidden=[town_pos],
+            grid_w=size,
+            grid_h=size
+        )
+    ]
 
     return {
         "player": {
             "name": player_name,
-            "gold": 1000,       # starting gold
-            "hp": 30,           # starting HP
-            "inventory": []     # empty inventory
+            "gold": 1000,
+            "hp": 30,
+            "inventory": []
         },
         "game": {
             "monsters_defeated": 0
         },
         "map": {
-            "player_pos": town_pos.copy(),     # starting at town
-            "town_pos": town_pos,
-            "monster_positions": monster_positions,
+            "player_pos": [0, 0],   # list for JSON compatibility
+            "town_pos": [0, 0],
             "size": size
-        }
+        },
+        "monsters": monsters   # ✅ REQUIRED for assignment
     }
 
 def create_sword():
@@ -504,7 +524,9 @@ def display_map(state):
     player = state["map"]["player_pos"]
     town = state["map"]["town_pos"]
 
-    monsters = state["map"].get("monster_positions", [])
+    for monster in state["monsters"]:
+    if [x, y] == [monster.x, monster.y]:
+        row += " M "
 
     print("\n--- Map ---")
 
@@ -549,9 +571,36 @@ def run_map_interface(state):
         elif result == "returned_to_town":
             print("You returned to town.")
             return "town"
-        elif result == "monster_encounter":
-            print("A monster blocks your path!")
-            return "monster"
+        
+        player_pos = tuple(state["map"]["player_pos"])
+
+        for monster in state["monsters"]:
+            if (monster.x, monster.y) == player_pos:
+                print("A monster blocks your path!")
+                return "monster"
+
+        grid_size = state["map"]["size"]
+
+        forbidden = [
+            tuple(state["map"]["player_pos"]),
+            tuple(state["map"]["town_pos"])
+        ]
+
+        for monster in state["monsters"]:
+            occupied = [(m.x, m.y) for m in state["monsters"] if m != monster]
+
+            monster.move(
+                occupied=occupied,
+                forbidden=forbidden,
+                grid_w=grid_size,
+                grid_h=grid_size
+            )
+
+        for monster in state["monsters"]:
+            if (monster.x, monster.y) == player_pos:
+                print("A monster found you!")
+                return "monster"
+          
 
 # Demonstration Section
 

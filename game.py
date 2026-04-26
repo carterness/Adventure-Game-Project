@@ -21,6 +21,27 @@ def save_game(state, filename):
 
     print("Game saved!")
 
+import json
+from WanderingMonster import WanderingMonster
+
+
+def load_game(filename):
+    try:
+        with open(filename, "r") as f:
+            state = json.load(f)
+
+        # convert monsters back into objects
+        state["monsters"] = [
+            WanderingMonster.from_dict(m)
+            for m in state.get("monsters", [])
+        ]
+
+        print("Game loaded!")
+        return state
+
+    except FileNotFoundError:
+        print("Save file not found.")
+        return None
 
 def get_main_menu_choice():
     while True:

@@ -525,23 +525,31 @@ def display_map(state):
     player = state["map"]["player_pos"]
     town = state["map"]["town_pos"]
 
-    for monster in state["monsters"]:
-        if [x, y] == [monster.x, monster.y]:
-            row += " M "
-
     print("\n--- Map ---")
 
     for y in range(size):
         row = ""
         for x in range(size):
+
             if [x, y] == player:
                 row += " P "
+
             elif [x, y] == town:
                 row += " T "
-            elif [x, y] in monsters:
-                row += " M "
+
             else:
-                row += " . "
+                # Check monsters INSIDE the loop
+                monster_here = False
+                for monster in state["monsters"]:
+                    if [x, y] == [monster.x, monster.y]:
+                        monster_here = True
+                        break
+
+                if monster_here:
+                    row += " M "
+                else:
+                    row += " . "
+
         print(row)
 
 def run_map_interface(state):

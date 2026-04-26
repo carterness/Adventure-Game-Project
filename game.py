@@ -1,6 +1,6 @@
 import json
 import gamefunctions as gf
-
+from WanderingMonster import WanderingMonster
 
 def save_game(state, filename="savegame.json"):
     with open(filename, "w") as f:
@@ -8,15 +8,17 @@ def save_game(state, filename="savegame.json"):
     print(f"Game saved to {filename}!")
 
 
-def load_game(filename="savegame.json"):
-    try:
-        with open(filename, "r") as f:
-            state = json.load(f)
-        print(f"Game loaded from {filename}!")
-        return state
-    except FileNotFoundError:
-        print("Save file not found.")
-        return None
+
+def save_game(state, filename):
+    state_copy = state.copy()
+
+    # Convert monsters to JSON-safe format
+    state_copy["monsters"] = [m.to_dict() for m in state["monsters"]]
+
+    with open(filename, "w") as f:
+        json.dump(state_copy, f, indent=4)
+
+    print("Game saved!")
 
 
 def get_main_menu_choice():

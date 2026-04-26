@@ -238,10 +238,12 @@ def get_user_fight_action():
 def fight_monster(state):
     import random
 
-    current_pos = state["map"]["player_pos"]
+    monster = new_random_monster()
 
-    if current_pos in state["map"]["monster_positions"]:
-        state["map"]["monster_positions"].remove(current_pos)
+    print("\nA wild monster appears!")
+    print(f"{monster['name']}: {monster['description']}")
+
+    monster_hp = monster["health"]
 
     size = state["map"]["size"]
     town = state["map"]["town_pos"]

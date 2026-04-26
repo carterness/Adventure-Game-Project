@@ -244,23 +244,6 @@ def fight_monster(state):
     print(f"{monster['name']}: {monster['description']}")
 
     monster_hp = monster["health"]
-
-    size = state["map"]["size"]
-    town = state["map"]["town_pos"]
-
-    while True:
-      new_pos = [random.randint(0, size - 1), random.randint(0, size - 1)]
-      if new_pos != town and new_pos not in state["map"]["monster_positions"]:
-        state["map"]["monster_positions"].append(new_pos)
-        break
-    
-    monster = new_random_monster()
-
-    print("\nA wild monster appears!")
-    print(f"{monster['name']}: {monster['description']}")
-
-    monster_hp = monster["health"]
-
     # Bomb check (instant win)
     if use_bomb(state):
         print(f"You defeated the {monster['name']} instantly!")

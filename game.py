@@ -164,7 +164,7 @@ def game_loop(state):
 
             save_game(state, filename)
             print("Game saved. Goodbye!")
-            break
+            return
 
         elif choice == "7":
             print("Goodbye!")

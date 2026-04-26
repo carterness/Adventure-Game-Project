@@ -110,65 +110,37 @@ def shop_menu(state):
 
 def game_loop(state):
     while True:
-        player = state["player"]
-        print(f"\nHP: {player['hp']} | Gold: {player['gold']}")
+        print(f"\nHP: {state['player']['hp']} | Gold: {state['player']['gold']}")
 
         choice = get_main_menu_choice()
 
         if choice == "1":
             result = gf.run_map_interface(state)
 
-        if result == "monster":
-            gf.fight_monster(state)
-
-            player_pos = tuple(state["map"]["player_pos"])
-
-            state["monsters"] = [
-                m for m in state["monsters"]
-                if (m.x, m.y) != player_pos
-            ]
-
-        if len(state["monsters"]) == 0:
-            size = state["map"]["size"]
-            town = tuple(state["map"]["town_pos"])
-
-            state["monsters"].append(
-            WanderingMonster.random_spawn([], [town], size, size)
-            )
-
-            state["monsters"].append(
-                WanderingMonster.random_spawn(
-                    [(m.x, m.y) for m in state["monsters"]],
-                    [town],
-                    size,
-                    size
-                )
-            )
-
+            if result == "monster":
+                gf.fight_monster(state)
+                
         elif choice == "2":
             gf.sleep_inn(state)
-
+            
         elif choice == "3":
             gf.equip_item(state, "weapon")
 
         elif choice == "4":
-            shop_menu(state)
+            gf.print_shop_menu()
 
         elif choice == "5":
             gf.view_inventory(state)
 
         elif choice == "6":
-            filename = input("Enter save filename (or press Enter for default): ")
-            if filename == "":
-                filename = "savegame.json"
-
+            filename = input("Enter save filename: ")
             save_game(state, filename)
             print("Game saved. Goodbye!")
             return
-
+            
         elif choice == "7":
             print("Goodbye!")
-            break
+            return
 
         if state["player"]["hp"] <= 0:
             print("Game Over!")

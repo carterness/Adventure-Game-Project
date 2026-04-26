@@ -526,8 +526,8 @@ def display_map(state):
     town = state["map"]["town_pos"]
 
     for monster in state["monsters"]:
-    if [x, y] == [monster.x, monster.y]:
-        row += " M "
+        if [x, y] == [monster.x, monster.y]:
+            row += " M "
 
     print("\n--- Map ---")
 

@@ -420,19 +420,15 @@ def fight_monster(state):
 from WanderingMonster import WanderingMonster
 
 def initialize_game_state(player_name):
-    """
-    Initialize the game state dictionary for a new player.
+    from WanderingMonster import WanderingMonster
 
-    Returns a dictionary containing player info and game stats.
-    """
     size = 10
-    town_pos = (0, 0)
+    town_pos = [0, 0]
 
-    # Spawn ONE monster at start
     monsters = [
         WanderingMonster.random_spawn(
             occupied=[],
-            forbidden=[town_pos],
+            forbidden=[tuple(town_pos)],
             grid_w=size,
             grid_h=size
         )
@@ -456,7 +452,7 @@ def initialize_game_state(player_name):
             "size": size
         },
 
-        "monsters": [],
+        "monsters": monsters,
 
         "allies": []
     }

@@ -3,25 +3,26 @@ import random
 
 class WanderingMonster:
     def __init__(self, x, y, monster_type, color, hp):
+        import random
+
         self.x = x
         self.y = y
         self.monster_type = monster_type
         self.color = color
         self.hp = hp
-        self.role = "fighter"   # fighter, healer, tank
+
+        # Existing fields
         self.is_ally = False
-        self.ability = None
-        
-        roles = ["fighter", "healer", "tank"]
-        self.role = random.choice(roles)
+        self.role = random.choice(["fighter", "healer", "tank"])
+
         if self.role == "fighter":
             self.ability = "fireball"
         elif self.role == "healer":
             self.ability = "heal"
-        elif self.role == "tank":
+        else:
             self.ability = "stun"
-        personalities = ["aggressive", "timid", "loyal"]
-        self.personality = random.choice(personalities)
+
+        self.personality = random.choice(["aggressive", "timid", "loyal"])
 
     # ---------------- RANDOM SPAWN ---------------- #
     @staticmethod
@@ -40,7 +41,7 @@ class WanderingMonster:
     # ---------------- LOAD FROM SAVE ---------------- #
     @staticmethod
     def from_dict(data):
-        return WanderingMonster(
+        monster = WanderingMonster(
             data["x"],
             data["y"],
             data["monster_type"],
@@ -51,6 +52,9 @@ class WanderingMonster:
         monster.role = data.get("role", "fighter")
         monster.is_ally = data.get("is_ally", False)
         monster.ability = data.get("ability", None)
+        monster.personality = data.get("personality", "aggressive")
+
+        return monster
 
     # ---------------- SAVE ---------------- #
     def to_dict(self):
@@ -59,13 +63,12 @@ class WanderingMonster:
             "y": self.y,
             "monster_type": self.monster_type,
             "color": self.color,
-            "hp": self.hp
+            "hp": self.hp,
+            "is_ally": self.is_ally,
+            "role": self.role,
+            "ability": self.ability,
+            "personality": self.personality
         }
-        "is_ally": self.is_ally
-
-        "role": self.role,
-        "is_ally": self.is_ally,
-        "ability": self.ability
 
     # ---------------- MOVEMENT ---------------- #
     def move(self, occupied, forbidden, grid_w, grid_h):

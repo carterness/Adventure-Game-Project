@@ -417,6 +417,7 @@ def fight_monster(state):
         player["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
 
+from WanderingMonster import WanderingMonster
 
 def initialize_game_state(player_name):
     """

@@ -394,6 +394,7 @@ def initialize_game_state(player_name):
         },
         "monsters": monsters   # ✅ REQUIRED for assignment
     }
+    "allies": []
 
 def create_sword():
     return {

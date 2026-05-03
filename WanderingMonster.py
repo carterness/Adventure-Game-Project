@@ -8,7 +8,20 @@ class WanderingMonster:
         self.monster_type = monster_type
         self.color = color
         self.hp = hp
+        self.role = "fighter"   # fighter, healer, tank
         self.is_ally = False
+        self.ability = None
+        
+        roles = ["fighter", "healer", "tank"]
+        self.role = random.choice(roles)
+        if self.role == "fighter":
+            self.ability = "fireball"
+        elif self.role == "healer":
+            self.ability = "heal"
+        elif self.role == "tank":
+            self.ability = "stun"
+        personalities = ["aggressive", "timid", "loyal"]
+        self.personality = random.choice(personalities)
 
     # ---------------- RANDOM SPAWN ---------------- #
     @staticmethod
@@ -35,6 +48,9 @@ class WanderingMonster:
             data["hp"]
         )
         monster.is_ally = data.get("is_ally", False)
+        monster.role = data.get("role", "fighter")
+        monster.is_ally = data.get("is_ally", False)
+        monster.ability = data.get("ability", None)
 
     # ---------------- SAVE ---------------- #
     def to_dict(self):
@@ -46,6 +62,10 @@ class WanderingMonster:
             "hp": self.hp
         }
         "is_ally": self.is_ally
+
+        "role": self.role,
+        "is_ally": self.is_ally,
+        "ability": self.ability
 
     # ---------------- MOVEMENT ---------------- #
     def move(self, occupied, forbidden, grid_w, grid_h):

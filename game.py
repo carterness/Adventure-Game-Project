@@ -16,7 +16,7 @@ def save_game(state, filename):
 
     state_copy["monsters"] = [m.to_dict() for m in state["monsters"]]
 
-    state_copy["allies"] = state["allies"]
+    state_copy["allies"] = [a.to_dict() for a in state["allies"]]
 
     with open(filename, "w") as f:
         json.dump(state_copy, f, indent=4)
@@ -38,7 +38,12 @@ def load_game(filename):
             for m in state.get("monsters", [])
         ]
 
-        state["allies"] = state.get("allies", [])
+        from WanderingMonster import WanderingMonster
+        
+        state["allies"] = [
+            WanderingMonster.from_dict(a)
+            for a in state.get("allies", [])
+        ]
 
         print("Game loaded!")
         return state

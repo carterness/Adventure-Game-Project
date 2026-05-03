@@ -157,7 +157,7 @@ def game_loop(state):
             gf.equip_item(state, "weapon")
 
         elif choice == "4":
-            gf.print_shop_menu()
+            shop_menu(state)
 
         elif choice == "5":
             gf.view_inventory(state)

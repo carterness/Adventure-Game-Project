@@ -444,17 +444,21 @@ def initialize_game_state(player_name):
             "hp": 30,
             "inventory": []
         },
+
         "game": {
             "monsters_defeated": 0
         },
+
         "map": {
-            "player_pos": [0, 0],  
-            "town_pos": [0, 0],
+            "player_pos": town_pos.copy(),
+            "town_pos": town_pos,
             "size": size
         },
-        "monsters": monsters 
+
+        "monsters": [],
+
+        "allies": []
     }
-    "allies": []
 
 def create_sword():
     return {

@@ -8,6 +8,7 @@ class WanderingMonster:
         self.monster_type = monster_type
         self.color = color
         self.hp = hp
+        self.is_ally = False
 
     # ---------------- RANDOM SPAWN ---------------- #
     @staticmethod
@@ -33,6 +34,7 @@ class WanderingMonster:
             data["color"],
             data["hp"]
         )
+        monster.is_ally = data.get("is_ally", False)
 
     # ---------------- SAVE ---------------- #
     def to_dict(self):
@@ -43,6 +45,7 @@ class WanderingMonster:
             "color": self.color,
             "hp": self.hp
         }
+        "is_ally": self.is_ally
 
     # ---------------- MOVEMENT ---------------- #
     def move(self, occupied, forbidden, grid_w, grid_h):

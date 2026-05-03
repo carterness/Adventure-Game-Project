@@ -237,126 +237,186 @@ def get_user_fight_action():
 
 def fight_monster(state):
     import random
+    from WanderingMonster import WanderingMonster
 
+    player = state["player"]
+    allies = state.get("allies", [])
+
+    # Create enemy
     monster = new_random_monster()
-
-    print("\nA wild monster appears!")
-    print(f"{monster['name']}: {monster['description']}")
-
     monster_hp = monster["health"]
-    # Bomb check (instant win)
+
+    # Assign personality (since this one isn't a WanderingMonster object)
+    personality = random.choice(["aggressive", "timid", "loyal"])
+
+    print(f"\nA wild {monster['name']} appears!")
+    print(f"Personality: {personality}")
+
+    # -------- BOMB CHECK --------
     if use_bomb(state):
         print(f"You defeated the {monster['name']} instantly!")
         print(f"You earned {monster['money']} gold!")
-        state["player"]["gold"] += monster["money"]
+        player["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
         return
 
-    while state["player"]["hp"] > 0 and monster_hp > 0:
-        display_fight_stats(state["player"]["hp"], monster["name"], monster_hp)
+    # -------- COMBAT LOOP --------
+    while player["hp"] > 0 and monster_hp > 0:
+
+        print("\n--- Fight Status ---")
+        print(f"Your HP: {player['hp']} | {monster['name']} HP: {monster_hp}")
 
         print("\nChoose an action:")
-        print("1) Attack")
-        print("2) Use Potion")
-        print("3) Run Away")
+        print("1) Light Attack (safe)")
+        print("2) Heavy Attack (high risk)")
+        print("3) Use Potion")
+        print("4) Befriend")
+        print("5) Run")
 
         choice = input("Enter choice: ")
 
+        player_damage = 0
+        monster_stunned = False
+
+        # -------- LIGHT ATTACK --------
         if choice == "1":
-            base_damage = random.randint(5, 12)
+            player_damage = random.randint(5, 10)
 
-            weapon = get_equipped_weapon(state)
-            if weapon:
-                base_damage += weapon["damage"]
-                weapon["currentDurability"] -= 1
-
-                print(f"Using {weapon['name']}! +{weapon['damage']} damage "
-                    f"(Durability: {weapon['currentDurability']}/{weapon['maxDurability']})")
-
-                if weapon["currentDurability"] == 0:
-                    print(f"Your {weapon['name']} broke!")
-                    state["player"]["inventory"].remove(weapon)
-
-            # Critical hit (20% chance)
-            if random.random() < 0.2:
-                base_damage *= 2
-                print("CRITICAL HIT!")
-
-            monster_hp -= base_damage
-            print(f"You deal {base_damage} damage!")
-
+        # -------- HEAVY ATTACK --------
         elif choice == "2":
-            inventory = state["player"]["inventory"]
-            for item in inventory:
+            if random.random() < 0.6:
+                player_damage = random.randint(12, 20)
+                print("Heavy hit lands!")
+            else:
+                print("You missed!")
+
+        # -------- POTION --------
+        elif choice == "3":
+            for item in player["inventory"]:
                 if item["name"] == "Potion":
-                    state["player"]["hp"] += 15
-                    state["player"]["hp"] = min(state["player"]["hp"], 30)
-                    inventory.remove(item)
-                    print("You used a Potion! (+15 HP)")
+                    player["hp"] = min(30, player["hp"] + 15)
+                    player["inventory"].remove(item)
+                    print("You used a Potion!")
                     break
             else:
-                print("No potions available!")
+                print("No potions!")
                 continue
 
-        elif choice == "3":
-            if random.random() < 0.5:
-                print("You successfully ran away!")
+        # -------- BEFRIEND --------
+        elif choice == "4":
+            chance = 0.3
+
+            if monster_hp < monster["health"] * 0.5:
+                chance += 0.3
+
+            if personality == "loyal":
+                chance += 0.2
+
+            if random.random() < chance:
+                print(f"The {monster['name']} has joined you!")
+
+                ally = WanderingMonster(
+                    x=0,
+                    y=0,
+                    monster_type=monster["name"],
+                    color=[0, 255, 0],
+                    hp=monster_hp
+                )
+
+                ally.is_ally = True
+                state["allies"].append(ally)
+
                 return
             else:
-                print("You failed to escape!")
+                print("Befriend failed!")
+
+        # -------- RUN --------
+        elif choice == "5":
+            if random.random() < 0.5:
+                print("You escaped!")
+                return
+            else:
+                print("Failed to escape!")
 
         else:
             print("Invalid choice.")
             continue
 
-        if monster_hp > 0:
-            damage = random.randint(monster["power"] - 3, monster["power"] + 3)
+        # -------- APPLY PLAYER DAMAGE --------
+        if player_damage > 0:
+            weapon = get_equipped_weapon(state)
+            if weapon:
+                player_damage += weapon["damage"]
+                weapon["currentDurability"] -= 1
 
-            # Shield reduction
-            shield = None
-            for item in state["player"]["inventory"]:
-                if item.get("type") == "armor":
-                    shield = item
-                    break
+                print(f"Using {weapon['name']}! +{weapon['damage']} damage "
+                      f"(Durability: {weapon['currentDurability']}/{weapon['maxDurability']})")
 
-            if shield:
-                damage = max(0, damage - 3)
-                print("Your shield reduces damage!")
+                if weapon["currentDurability"] <= 0:
+                    print(f"Your {weapon['name']} broke!")
+                    player["inventory"].remove(weapon)
 
-            state["player"]["hp"] -= damage
-            state["player"]["hp"] = max(0, state["player"]["hp"])
+            # Crit chance
+            if random.random() < 0.2:
+                player_damage *= 2
+                print("CRITICAL HIT!")
 
-            print(f"The {monster['name']} deals {damage} damage!")
+            monster_hp -= player_damage
+            print(f"You deal {player_damage} damage!")
 
-    if state["player"]["hp"] <= 0:
+        # -------- ALLY ACTIONS --------
+        for ally in allies:
+            if ally.hp <= 0:
+                continue
+
+            print(f"{ally.monster_type} ({ally.role}) acts!")
+
+            if ally.ability == "fireball":
+                dmg = random.randint(8, 15)
+                monster_hp -= dmg
+                print(f"Fireball hits for {dmg}!")
+
+            elif ally.ability == "heal":
+                heal = random.randint(5, 10)
+                player["hp"] = min(30, player["hp"] + heal)
+                print(f"Heals you for {heal}!")
+
+            elif ally.ability == "stun":
+                if random.random() < 0.4:
+                    monster_stunned = True
+                    print("Enemy stunned!")
+
+        # -------- MONSTER TURN --------
+        if monster_hp > 0 and not monster_stunned:
+
+            if personality == "timid" and random.random() < 0.3:
+                print(f"The {monster['name']} hesitates!")
+            else:
+                damage = random.randint(monster["power"] - 3, monster["power"] + 3)
+
+                # Aggressive hits harder
+                if personality == "aggressive":
+                    damage += 3
+
+                player["hp"] -= damage
+                player["hp"] = max(0, player["hp"])
+
+                print(f"The {monster['name']} hits you for {damage}!")
+
+        elif monster_stunned:
+            print(f"The {monster['name']} is stunned and cannot move!")
+
+    # -------- RESULT --------
+    if player["hp"] <= 0:
         print("You were defeated...")
-        state["player"]["hp"] = 0
+        player["hp"] = 0
 
     elif monster_hp <= 0:
         print(f"You defeated the {monster['name']}!")
         print(f"You earned {monster['money']} gold!")
-        state["player"]["gold"] += monster["money"]
+        player["gold"] += monster["money"]
         state["game"]["monsters_defeated"] += 1
-    
-    player_pos = tuple(state["map"]["player_pos"])
 
-    state["monsters"] = [
-        m for m in state["monsters"]
-        if (m.x, m.y) != player_pos
-    ]
-    if len(state["monsters"]) == 0:
-        state["monsters"].append(
-            WanderingMonster.random_spawn([], [(0, 0)], 10, 10)
-        )
-        state["monsters"].append(
-            WanderingMonster.random_spawn(
-                [(m.x, m.y) for m in state["monsters"]],
-                [(0, 0)],
-                10, 10
-            )
-        )
-
-from WanderingMonster import WanderingMonster
 
 def initialize_game_state(player_name):
     """
@@ -388,11 +448,11 @@ def initialize_game_state(player_name):
             "monsters_defeated": 0
         },
         "map": {
-            "player_pos": [0, 0],   # list for JSON compatibility
+            "player_pos": [0, 0],  
             "town_pos": [0, 0],
             "size": size
         },
-        "monsters": monsters   # ✅ REQUIRED for assignment
+        "monsters": monsters 
     }
     "allies": []
 
